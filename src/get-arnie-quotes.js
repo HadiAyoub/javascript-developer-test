@@ -14,20 +14,26 @@ const getArnieQuotes = async (urls) => {
     return httpGet(url);
   });
 
-  let arnieResponses = await Promise.all(arnieRequests);
+  try {
+    let arnieResponses = await Promise.all(arnieRequests);
 
-  //process the API response into the required format (in real world, I would add context here.. I actually have no clue why we want quotes in this way)
-  arnieResponses.forEach(arnieResponse => {
+    //process the API response into the required format (in real world, I would add context here.. I actually have no clue why we want quotes in this way)
+    arnieResponses.forEach(arnieResponse => {
 
-    //the API returns stringified JSON, must parse it first (if I could, I would move this parsing logic to the http interface)
-    arnieResponse.body = JSON.parse(arnieResponse.body);
+      //the API returns stringified JSON, must parse it first (if I could, I would move this parsing logic to the http interface)
+      //I don't think optional chaining has found it's way to javascript, but I sure would have loved to use it here. 
+      arnieResponse.body = JSON.parse(arnieResponse.body);
 
-    if(arnieResponse.status === 200){
-      arnieQuotes.push({'Arnie Quote': arnieResponse.body.message});
-    }else{
-      arnieQuotes.push({'FAILURE': arnieResponse.body.message});
-    }
-  });
+      if (arnieResponse.status === 200) {
+        arnieQuotes.push({ 'Arnie Quote': arnieResponse.body.message });
+      } else {
+        arnieQuotes.push({ 'FAILURE': arnieResponse.body.message });
+      }
+    });
+
+  } catch (e) {
+    console.log(e);
+  }
 
   return arnieQuotes;
 };
